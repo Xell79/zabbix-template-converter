@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 A script to convert Zabbix templates between versions.
 """
@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import argparse
 import re
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 def debug(msg):
     from sys import stderr
@@ -16,6 +16,9 @@ def debug(msg):
 def warn(msg):
     from sys import stderr
     stderr.write('Warning: %s\n' % msg)
+
+def cmp(a, b):
+    return (a > b) - (a < b) 
 
 class NotApplicableError(Exception):
     """
@@ -77,6 +80,10 @@ class VersionMustMatch(ConversionRule):
             self.outversion = '3.0'
         elif self.versioncmp('3.3') < 0:
             self.outversion = '3.2'
+        elif self.versioncmp('3.4') < 0:
+            self.outversion = '3.3'
+        elif self.versioncmp('3.5') < 0:
+            self.outversion = '3.4'
         else:
             self.outversion = 'unknown'
             raise ValueError('Unsupported output version: %s' % self.version)
@@ -123,6 +130,7 @@ class FixMissingValueMaps(ConversionRule):
             for node in self.root.findall('.//%s/valuemap' % itemtype):
                 node.clear()
 
+
 class FixHttpTests(ConversionRule):
     """
     Rule to remove HTTP Test definitions from templates older that 3.2.0.
@@ -140,6 +148,160 @@ class FixHttpTests(ConversionRule):
             htests = node.find('httptests')
             if htests is not None:
                 node.remove(htests)
+
+
+class FixMissingDiscoveryRules(ConversionRule):
+    """Rule to remove references to value maps"""
+
+    def __str__(self):
+        return 'DiscoveryRules Normalize'
+
+    def apply(self):
+        if self.versioncmp('3.5') >= 0:
+            raise NotApplicableError()
+
+        for node in self.root.findall('.//discovery_rule'):
+            point = node.find('timeout')
+            node.remove(point)
+            point = node.find('url')
+            node.remove(point)
+            point = node.find('query_fields')
+            node.remove(point)
+            point = node.find('posts')
+            node.remove(point)
+            point = node.find('status_codes')
+            node.remove(point)
+            point = node.find('follow_redirects')
+            node.remove(point)
+            point = node.find('post_type')
+            node.remove(point)
+            point = node.find('http_proxy')
+            node.remove(point)
+            point = node.find('headers')
+            node.remove(point)
+            point = node.find('retrieve_mode')
+            node.remove(point)
+            point = node.find('request_method')
+            node.remove(point)
+            point = node.find('allow_traps')
+            node.remove(point)
+            point = node.find('ssl_cert_file')
+            node.remove(point)
+            point = node.find('ssl_key_file')
+            node.remove(point)
+            point = node.find('ssl_key_password')
+            node.remove(point)
+            point = node.find('verify_peer')
+            node.remove(point)
+            point = node.find('verify_host')
+            node.remove(point)
+
+
+class FixMissingItemPrototype(ConversionRule):
+    """Rule to remove references to value maps"""
+
+    def __str__(self):
+        return 'ItemPrototype Normalize'
+
+    def apply(self):
+        if self.versioncmp('3.5') >= 0:
+            raise NotApplicableError()
+
+        for node in self.root.findall('.//item_prototype'):
+            point = node.find('timeout')
+            node.remove(point)
+            point = node.find('url')
+            node.remove(point)
+            point = node.find('query_fields')
+            node.remove(point)
+            point = node.find('posts')
+            node.remove(point)
+            point = node.find('status_codes')
+            node.remove(point)
+            point = node.find('follow_redirects')
+            node.remove(point)
+            point = node.find('post_type')
+            node.remove(point)
+            point = node.find('http_proxy')
+            node.remove(point)
+            point = node.find('headers')
+            node.remove(point)
+            point = node.find('retrieve_mode')
+            node.remove(point)
+            point = node.find('request_method')
+            node.remove(point)
+            point = node.find('allow_traps')
+            node.remove(point)
+            point = node.find('ssl_cert_file')
+            node.remove(point)
+            point = node.find('ssl_key_file')
+            node.remove(point)
+            point = node.find('ssl_key_password')
+            node.remove(point)
+            point = node.find('verify_peer')
+            node.remove(point)
+            point = node.find('verify_host')
+            node.remove(point)
+            point = node.find('output_format')
+            node.remove(point)
+            point = node.find('master_item')
+            node.remove(point)
+            if not node.find('master_item_prototype'):
+                node.set('master_item_prototype','')
+
+
+class FixMissingItems(ConversionRule):
+    """Rule to remove references to value maps"""
+
+    def __str__(self):
+        return 'Items Normalize'
+
+    def apply(self):
+        if self.versioncmp('3.5') >= 0:
+            raise NotApplicableError()
+
+        for node in self.root.findall('.//items/item'):
+            point = node.find('timeout')
+            node.remove(point)
+            point = node.find('url')
+            node.remove(point)
+            point = node.find('query_fields')
+            node.remove(point)
+            point = node.find('posts')
+            node.remove(point)
+            point = node.find('status_codes')
+            node.remove(point)
+            point = node.find('follow_redirects')
+            node.remove(point)
+            point = node.find('post_type')
+            node.remove(point)
+            point = node.find('http_proxy')
+            node.remove(point)
+            point = node.find('headers')
+            node.remove(point)
+            point = node.find('retrieve_mode')
+            node.remove(point)
+            point = node.find('request_method')
+            node.remove(point)
+            point = node.find('allow_traps')
+            node.remove(point)
+            point = node.find('ssl_cert_file')
+            node.remove(point)
+            point = node.find('ssl_key_file')
+            node.remove(point)
+            point = node.find('ssl_key_password')
+            node.remove(point)
+            point = node.find('verify_peer')
+            node.remove(point)
+            point = node.find('verify_host')
+            node.remove(point)
+            point = node.find('output_format')
+            node.remove(point)
+            point = node.find('master_item')
+            node.remove(point)
+            if not node.find('master_item'):
+                node.set('master_item','')
+
 
 class FixDiscoveryRuleFilters(ConversionRule):
     """
@@ -184,6 +346,7 @@ class FixDiscoveryRuleFilters(ConversionRule):
                         node.clear()
             else:
                 raise ValueError('malformed discovery rule filter in \'%s\'' % discovery_rule_name)
+
 
 class FixApplicationPrototypes(ConversionRule):
     """
@@ -314,7 +477,7 @@ def __main__():
 
     parser.add_argument('file',
                         help='Zabbix template XML file',
-                        type=file)
+                        type=str)
 
     args = parser.parse_args()
 
